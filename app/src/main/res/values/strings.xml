@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">BookDbApp</string>
+    <string name="book_title">書名：</string>
+    <string name="book_author">作者：</string>
+    <string name="book_publisher">出版商：</string>
+    <string name="add">新增</string>
+    <string name="list">列表</string>
+</resources>

@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -14,6 +15,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookdbapp.databinding.ActivityMainBinding
+import com.google.android.material.bottomsheet.BottomSheetDialog
 
 class MainActivity : AppCompatActivity() {
 
@@ -22,9 +24,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var bookList: ArrayList<Book>
     private lateinit var bookRecyclerViewAdapter: BookRecyclerViewAdapter
 
-    private class BookRecyclerViewAdapter(private val books: List<Book>):
+    private class BookRecyclerViewAdapter(private val books: ArrayList<Book>):
             RecyclerView.Adapter<BookRecyclerViewAdapter.ViewHolder>() {
-                data class ViewHolder(private val bookView: View):
+                data class ViewHolder(val bookView: View):
                         RecyclerView.ViewHolder(bookView) {
                             val tvTitle = bookView.findViewById<TextView>(R.id.tvTitle)
                             val tvAuthor = bookView.findViewById<TextView>(R.id.tvAuthor)
@@ -42,6 +44,23 @@ class MainActivity : AppCompatActivity() {
             holder.tvTitle.text = book.title
             holder.tvAuthor.text = book.author
             holder.tvPublisher.text = book.publisher
+
+            holder.bookView.setOnLongClickListener {
+                val dlg =BottomSheetDialog(it.context, R.style.BottomSheetDlg)
+                dlg.setContentView(R.layout.dlg_del_and_update)
+                val btDel = dlg.findViewById<Button>(R.id.btDel)
+                val btUpdate = dlg.findViewById<Button>(R.id.btUpdate)
+
+                btDel?.setOnClickListener {
+                    BookDbHelper.getInstance()?.deleteBook(book.id)
+                    books.removeAt(position)
+                    notifyDataSetChanged()
+                    dlg.dismiss()
+                }
+
+                dlg.show()
+                true
+            }
         }
 
         override fun getItemCount(): Int {
@@ -71,6 +90,7 @@ class MainActivity : AppCompatActivity() {
 
         dataBinding.btAdd.setOnClickListener {
             val book = Book(
+                -1,
                 dataBinding.edTitle.text.toString(),
                 dataBinding.edAuthor.text.toString(),
                 dataBinding.edPublisher.text.toString(),
